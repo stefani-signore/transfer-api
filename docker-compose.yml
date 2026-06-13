@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: itau-postgres
+    environment:
+      POSTGRES_DB: transferdb
+      POSTGRES_USER: itau
+      POSTGRES_PASSWORD: itau123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
