@@ -1,0 +1,128 @@
+package com.itau.transferAPI.business;
+
+import com.itau.transferAPI.domain.TransferStatus;
+import com.itau.transferAPI.dto.request.TransferRequest;
+import com.itau.transferAPI.dto.response.TransferResponse;
+import com.itau.transferAPI.persistence.repository.ClientRepository;
+import com.itau.transferAPI.persistence.repository.TransferRepository;
+import com.itau.transferAPI.persistence.entity.ClientEntity;
+import com.itau.transferAPI.persistence.entity.TransferEntity;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class TransferUseCase implements TransferService {
+
+    private static final BigDecimal MAX_TRANSFER =
+            new BigDecimal("10000.00");
+
+    private final ClientRepository clientRepository;
+    private final TransferRepository transferRepository;
+
+    public TransferUseCase(
+            ClientRepository clientRepository,
+            TransferRepository transferRepository) {
+
+        this.clientRepository = clientRepository;
+        this.transferRepository = transferRepository;
+    }
+
+    @Override
+    @Transactional
+    public TransferResponse transfer(
+            TransferRequest request) {
+
+        TransferStatus status = TransferStatus.SUCCESS;
+
+        try {
+
+            ClientEntity source = clientRepository
+                    .findByAccountNumberForUpdate(
+                            request.sourceAccount())
+                    .orElseThrow(() ->
+                            new IllegalArgumentException(
+                                    "Conta origem não encontrada"));
+
+            ClientEntity destination = clientRepository
+                    .findByAccountNumberForUpdate(
+                            request.destinationAccount())
+                    .orElseThrow(() ->
+                            new IllegalArgumentException(
+                                    "Conta destino não encontrada"));
+
+            if (request.amount()
+                    .compareTo(MAX_TRANSFER) > 0) {
+
+                throw new IllegalArgumentException(
+                        "Transferência acima do limite permitido");
+            }
+
+            if (source.getBalance()
+                    .compareTo(request.amount()) < 0) {
+
+                throw new IllegalArgumentException(
+                        "Saldo insuficiente");
+            }
+
+            source.setBalance(
+                    source.getBalance()
+                            .subtract(request.amount()));
+
+            destination.setBalance(
+                    destination.getBalance()
+                            .add(request.amount()));
+
+            clientRepository.save(source);
+            clientRepository.save(destination);
+
+        } catch (Exception ex) {
+            status = TransferStatus.FAILED;
+        }
+
+        TransferEntity transfer = new TransferEntity(
+                UUID.randomUUID(),
+                request.sourceAccount(),
+                request.destinationAccount(),
+                request.amount(),
+                status,
+                LocalDateTime.now()
+        );
+
+        transferRepository.save(transfer);
+
+        return new TransferResponse(
+                transfer.getId(),
+                transfer.getSourceAccount(),
+                transfer.getDestinationAccount(),
+                transfer.getAmount(),
+                transfer.getStatus().name(),
+                transfer.getCreatedAt()
+        );
+    }
+
+    @Override
+    public List<TransferResponse> findByAccount(
+            String accountNumber) {
+
+        return transferRepository
+                .findBySourceAccountOrDestinationAccountOrderByCreatedAtDesc(
+                        accountNumber,
+                        accountNumber
+                )
+                .stream()
+                .map(transfer -> new TransferResponse(
+                        transfer.getId(),
+                        transfer.getSourceAccount(),
+                        transfer.getDestinationAccount(),
+                        transfer.getAmount(),
+                        transfer.getStatus().name(),
+                        transfer.getCreatedAt()
+                ))
+                .toList();
+    }
+}
