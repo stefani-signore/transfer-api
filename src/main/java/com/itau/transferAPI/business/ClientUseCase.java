@@ -1,5 +1,7 @@
 package com.itau.transferAPI.business;
 
+import com.itau.transferAPI.common.exception.BusinessException;
+import com.itau.transferAPI.common.exception.NotFoundException;
 import com.itau.transferAPI.dto.request.ClientRequest;
 import com.itau.transferAPI.dto.response.ClientResponse;
 import com.itau.transferAPI.persistence.repository.ClientRepository;
@@ -24,7 +26,7 @@ public class ClientUseCase implements ClientService {
         if (clientRepository.existsByAccountNumber(
                 request.accountNumber())) {
 
-            throw new IllegalArgumentException(
+            throw new BusinessException(
                     "Número da conta já cadastrado");
         }
 
@@ -65,7 +67,7 @@ public class ClientUseCase implements ClientService {
         ClientEntity client = clientRepository
                 .findByAccountNumber(accountNumber)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(
+                        new NotFoundException(
                                 "Cliente não encontrado"));
 
         return new ClientResponse(
