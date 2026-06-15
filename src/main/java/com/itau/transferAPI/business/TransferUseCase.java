@@ -1,12 +1,14 @@
 package com.itau.transferAPI.business;
 
+import com.itau.transferAPI.common.exception.BusinessException;
+import com.itau.transferAPI.common.exception.NotFoundException;
 import com.itau.transferAPI.domain.TransferStatus;
 import com.itau.transferAPI.dto.request.TransferRequest;
 import com.itau.transferAPI.dto.response.TransferResponse;
-import com.itau.transferAPI.persistence.repository.ClientRepository;
-import com.itau.transferAPI.persistence.repository.TransferRepository;
 import com.itau.transferAPI.persistence.entity.ClientEntity;
 import com.itau.transferAPI.persistence.entity.TransferEntity;
+import com.itau.transferAPI.persistence.repository.ClientRepository;
+import com.itau.transferAPI.persistence.repository.TransferRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +36,7 @@ public class TransferUseCase implements TransferService {
 
     @Override
     @Transactional
-    public TransferResponse transfer(
-            TransferRequest request) {
-
-        TransferStatus status = TransferStatus.SUCCESS;
+    public TransferResponse transfer(TransferRequest request) {
 
         try {
 
@@ -45,27 +44,25 @@ public class TransferUseCase implements TransferService {
                     .findByAccountNumberForUpdate(
                             request.sourceAccount())
                     .orElseThrow(() ->
-                            new IllegalArgumentException(
+                            new NotFoundException(
                                     "Conta origem não encontrada"));
 
             ClientEntity destination = clientRepository
                     .findByAccountNumberForUpdate(
                             request.destinationAccount())
                     .orElseThrow(() ->
-                            new IllegalArgumentException(
+                            new NotFoundException(
                                     "Conta destino não encontrada"));
 
-            if (request.amount()
-                    .compareTo(MAX_TRANSFER) > 0) {
-
-                throw new IllegalArgumentException(
-                        "Transferência acima do limite permitido");
+            if (request.amount().compareTo(MAX_TRANSFER) > 0) {
+                throw new BusinessException(
+                        "Transferência acima do limite de R$ 10.000");
             }
 
             if (source.getBalance()
                     .compareTo(request.amount()) < 0) {
 
-                throw new IllegalArgumentException(
+                throw new BusinessException(
                         "Saldo insuficiente");
             }
 
@@ -80,29 +77,42 @@ public class TransferUseCase implements TransferService {
             clientRepository.save(source);
             clientRepository.save(destination);
 
-        } catch (Exception ex) {
-            status = TransferStatus.FAILED;
+            TransferEntity transfer = new TransferEntity(
+                    UUID.randomUUID(),
+                    request.sourceAccount(),
+                    request.destinationAccount(),
+                    request.amount(),
+                    TransferStatus.SUCCESS,
+                    LocalDateTime.now()
+            );
+
+            transferRepository.save(transfer);
+
+            return new TransferResponse(
+                    transfer.getId(),
+                    transfer.getSourceAccount(),
+                    transfer.getDestinationAccount(),
+                    transfer.getAmount(),
+                    transfer.getStatus().name(),
+                    transfer.getCreatedAt()
+            );
+
+        } catch (RuntimeException ex) {
+
+            TransferEntity failedTransfer =
+                    new TransferEntity(
+                            UUID.randomUUID(),
+                            request.sourceAccount(),
+                            request.destinationAccount(),
+                            request.amount(),
+                            TransferStatus.FAILED,
+                            LocalDateTime.now()
+                    );
+
+            transferRepository.save(failedTransfer);
+
+            throw ex;
         }
-
-        TransferEntity transfer = new TransferEntity(
-                UUID.randomUUID(),
-                request.sourceAccount(),
-                request.destinationAccount(),
-                request.amount(),
-                status,
-                LocalDateTime.now()
-        );
-
-        transferRepository.save(transfer);
-
-        return new TransferResponse(
-                transfer.getId(),
-                transfer.getSourceAccount(),
-                transfer.getDestinationAccount(),
-                transfer.getAmount(),
-                transfer.getStatus().name(),
-                transfer.getCreatedAt()
-        );
     }
 
     @Override
@@ -112,8 +122,7 @@ public class TransferUseCase implements TransferService {
         return transferRepository
                 .findBySourceAccountOrDestinationAccountOrderByCreatedAtDesc(
                         accountNumber,
-                        accountNumber
-                )
+                        accountNumber)
                 .stream()
                 .map(transfer -> new TransferResponse(
                         transfer.getId(),
@@ -125,4 +134,5 @@ public class TransferUseCase implements TransferService {
                 ))
                 .toList();
     }
+
 }

@@ -4,6 +4,8 @@ import com.itau.transferAPI.business.ClientService;
 import com.itau.transferAPI.dto.request.ClientRequest;
 import com.itau.transferAPI.dto.response.ClientResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,21 +21,32 @@ public class ClientController {
     }
 
     @PostMapping
-    public ClientResponse create(
-            @RequestBody @Valid ClientRequest request
-    ) {
-        return service.create(request);
+    public ResponseEntity<ClientResponse> create(
+            @RequestBody @Valid ClientRequest request) {
+
+        ClientResponse response =
+                service.create(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @GetMapping
-    public List<ClientResponse> findAll() {
-        return service.findAll();
+    public ResponseEntity<List<ClientResponse>> findAll() {
+
+        return ResponseEntity.ok(
+                service.findAll()
+        );
     }
 
     @GetMapping("/{accountNumber}")
-    public ClientResponse findByAccountNumber(
-            @PathVariable String accountNumber
-    ) {
-        return service.findByAccountNumber(accountNumber);
+    public ResponseEntity<ClientResponse>
+    findByAccountNumber(
+            @PathVariable String accountNumber) {
+
+        return ResponseEntity.ok(
+                service.findByAccountNumber(accountNumber)
+        );
     }
 }

@@ -1,10 +1,11 @@
 package com.itau.transferAPI.presentation;
 
-
 import com.itau.transferAPI.business.TransferService;
 import com.itau.transferAPI.dto.request.TransferRequest;
 import com.itau.transferAPI.dto.response.TransferResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,16 +21,25 @@ public class TransferController {
     }
 
     @PostMapping
-    public TransferResponse transfer(
+    public ResponseEntity<TransferResponse> transfer(
             @RequestBody @Valid TransferRequest request
     ) {
-        return service.transfer(request);
+
+        TransferResponse response =
+                service.transfer(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @GetMapping("/{accountNumber}")
-    public List<TransferResponse> history(
+    public ResponseEntity<List<TransferResponse>> history(
             @PathVariable String accountNumber
     ) {
-        return service.findByAccount(accountNumber);
+
+        return ResponseEntity.ok(
+                service.findByAccount(accountNumber)
+        );
     }
 }
