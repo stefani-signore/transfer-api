@@ -1,5 +1,6 @@
-package com.itau.transferAPI.business;
+package com.itau.transferAPI.business.usecase;
 
+import com.itau.transferAPI.business.service.ClientService;
 import com.itau.transferAPI.common.exception.BusinessException;
 import com.itau.transferAPI.common.exception.NotFoundException;
 import com.itau.transferAPI.dto.request.ClientRequest;

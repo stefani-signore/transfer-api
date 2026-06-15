@@ -1,6 +1,6 @@
 package com.itau.transferAPI.presentation;
 
-import com.itau.transferAPI.business.TransferService;
+import com.itau.transferAPI.business.service.TransferService;
 import com.itau.transferAPI.dto.request.TransferRequest;
 import com.itau.transferAPI.dto.response.TransferResponse;
 import jakarta.validation.Valid;

@@ -1,4 +1,4 @@
-package com.itau.transferAPI.business;
+package com.itau.transferAPI.business.service;
 
 import com.itau.transferAPI.dto.request.ClientRequest;
 import com.itau.transferAPI.dto.response.ClientResponse;

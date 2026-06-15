@@ -1,5 +1,6 @@
 package com.itau.transferAPI.business;
 
+import com.itau.transferAPI.business.usecase.TransferUseCase;
 import com.itau.transferAPI.dto.request.TransferRequest;
 import com.itau.transferAPI.persistence.repository.ClientRepository;
 import com.itau.transferAPI.persistence.repository.TransferRepository;
