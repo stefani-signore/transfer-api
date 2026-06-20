@@ -25,13 +25,16 @@ public class TransferService {
 
     private final ClientRepository clientRepository;
     private final TransferRepository transferRepository;
+    private final FailedTransferService failedTransferService;
 
     public TransferService(
             ClientRepository clientRepository,
-            TransferRepository transferRepository) {
+            TransferRepository transferRepository,
+            FailedTransferService failedTransferService) {
 
         this.clientRepository = clientRepository;
         this.transferRepository = transferRepository;
+        this.failedTransferService = failedTransferService;
     }
 
     @Transactional
@@ -108,7 +111,7 @@ public class TransferService {
                             LocalDateTime.now()
                     );
 
-            transferRepository.save(failedTransfer);
+            failedTransferService.save(failedTransfer);
 
             throw ex;
         }

@@ -1,5 +1,6 @@
 package com.itau.transferAPI.business;
 
+import com.itau.transferAPI.business.service.FailedTransferService;
 import com.itau.transferAPI.business.service.TransferService;
 import com.itau.transferAPI.dto.request.TransferRequest;
 import com.itau.transferAPI.persistence.repository.ClientRepository;
@@ -29,6 +30,9 @@ class TransferServiceTest {
 
     @Mock
     private TransferRepository transferRepository;
+
+    @Mock
+    private FailedTransferService failedTransferService;
 
     @InjectMocks
     private TransferService transferService;
