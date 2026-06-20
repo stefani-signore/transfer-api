@@ -1,6 +1,6 @@
 package com.itau.transferAPI.business;
 
-import com.itau.transferAPI.business.usecase.TransferUseCase;
+import com.itau.transferAPI.business.service.TransferService;
 import com.itau.transferAPI.dto.request.TransferRequest;
 import com.itau.transferAPI.persistence.repository.ClientRepository;
 import com.itau.transferAPI.persistence.repository.TransferRepository;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TransferUseCaseTest {
+class TransferServiceTest {
 
     @Mock
     private ClientRepository clientRepository;
@@ -27,7 +27,7 @@ class TransferUseCaseTest {
     private TransferRepository transferRepository;
 
     @InjectMocks
-    private TransferUseCase transferUseCase;
+    private TransferService transferService;
 
     @Test
     void deveTransferirComSucesso() {
@@ -53,7 +53,7 @@ class TransferUseCaseTest {
                         new BigDecimal("100")
                 );
 
-        transferUseCase.transfer(request);
+        transferService.transfer(request);
 
         assertEquals(
                 new BigDecimal("900"),

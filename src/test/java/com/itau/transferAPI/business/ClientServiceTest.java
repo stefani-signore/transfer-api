@@ -1,6 +1,6 @@
 package com.itau.transferAPI.business;
 
-import com.itau.transferAPI.business.usecase.ClientUseCase;
+import com.itau.transferAPI.business.service.ClientService;
 import com.itau.transferAPI.dto.request.ClientRequest;
 import com.itau.transferAPI.persistence.repository.ClientRepository;
 import com.itau.transferAPI.persistence.entity.ClientEntity;
@@ -13,17 +13,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ClientUseCaseTest {
+class ClientServiceTest {
 
     @Mock
     private ClientRepository clientRepository;
 
     @InjectMocks
-    private ClientUseCase clientUseCase;
+    private ClientService clientService;
 
     @Test
     void deveCriarCliente() {
@@ -46,7 +46,7 @@ class ClientUseCaseTest {
         when(clientRepository.save(any()))
                 .thenReturn(saved);
 
-        var response = clientUseCase.create(request);
+        var response = clientService.create(request);
 
         assertEquals("Stefani", response.name());
         assertEquals("123", response.accountNumber());
