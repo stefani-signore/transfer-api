@@ -28,16 +28,11 @@ API REST desenvolvida em Java e Spring Boot para gerenciamento de clientes e tra
 * Swagger / OpenAPI
 
 
-## Arquitetura
+## Arquitetura e Decisões Técnicas
 
-O projeto segue uma arquitetura em camadas:
+A aplicação foi estruturada em camadas, separando responsabilidades entre controllers, services e repositories.
 
-* Controller
-* Service
-* Use Case
-* Repository
-* Database
-
+A operação de transferência utiliza lock pessimista (PESSIMISTIC_WRITE) para evitar inconsistências em cenários de concorrência.
 
 ## Executando o Projeto
 
