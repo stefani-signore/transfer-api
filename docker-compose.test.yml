@@ -1,0 +1,12 @@
+name: transferapi-test
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: itau-postgres_test
+    environment:
+      POSTGRES_DB: transferdb_test
+      POSTGRES_USER: itau_test
+      POSTGRES_PASSWORD: itau123_test
+    ports:
+      - "5433:5432"

@@ -30,9 +30,9 @@ API REST desenvolvida em Java e Spring Boot para gerenciamento de clientes e tra
 
 ## Arquitetura e Decisões Técnicas
 
-A aplicação foi estruturada em camadas, separando responsabilidades entre controllers, services e repositories.
+* A aplicação foi estruturada em camadas, separando responsabilidades entre controllers, services e repositories.
 
-A operação de transferência utiliza lock pessimista (PESSIMISTIC_WRITE) para evitar inconsistências em cenários de concorrência.
+* A operação de transferência utiliza lock pessimista (PESSIMISTIC_WRITE) para evitar inconsistências em cenários de concorrência.
 
 ## Executando o Projeto
 
@@ -131,11 +131,27 @@ GET
 ```
 
 ## Testes
+* Testes unitários: validam a regra de negócio da classe, utilizando JUnit e Mockito.
+* Testes de integração: executados com Spring Boot utilizando o profile "test" e um banco PostgreSQL dedicado (itau-postgres_test), isolando do banco principal da aplicação.
 
-Executar todos os testes:
+## Executando os Testes
+
+### 1. Subir o banco de dados dedicado aos testes de integração:
+
+```bash
+docker compose -f docker-compose.test.yml up -d
+```
+
+### 2.a) Executar somente os testes:
 
 ```bash
 mvn test
+```
+
+### 2.b) Gerar artefato e executar os testes:
+
+```bash
+mvn clean package
 ```
 
 
@@ -143,3 +159,9 @@ mvn test
 ## Autor
 
 Stefani Signore
+
+## Observações
+
+_Este projeto contou com apoio de ferramentas de IA generativa (ChatGPT e Claude.AI) para esclarcimento de dúvidas, revisão de código e discussões de decisões técnicas._
+
+***_As validações e as decisões finais foram realizadas de forma consciente durante o desenvolvimento do projeto._***
