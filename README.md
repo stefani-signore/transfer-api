@@ -162,6 +162,6 @@ Stefani Signore
 
 ## Observações
 
-_Este projeto contou com apoio de ferramentas de IA generativa (ChatGPT e Claude.AI) para esclarcimento de dúvidas, revisão de código e discussões de decisões técnicas._
+_Este projeto contou com apoio de ferramentas de IA generativa (ChatGPT e Claude.AI) para esclarecimento de dúvidas, revisão de código e discussões de decisões técnicas._
 
 ***_As validações e as decisões finais foram realizadas de forma consciente durante o desenvolvimento do projeto._***
